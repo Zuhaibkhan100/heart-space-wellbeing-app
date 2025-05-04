@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,6 +19,10 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
+				heading: ['Montserrat', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -61,7 +66,27 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				lavender: {
+					light: '#E6E6FA',
+					DEFAULT: '#9F9FE3',
+					dark: '#7575A3',
+				},
+				blush: {
+					light: '#FFE4E1',
+					DEFAULT: '#F8C8C6',
+					dark: '#E8A19E',
+				},
+				mint: {
+					light: '#E0F5E6',
+					DEFAULT: '#B5E5C5',
+					dark: '#7FB88F',
+				},
+				sky: {
+					light: '#E1F5FE',
+					DEFAULT: '#B3E5FC',
+					dark: '#81D4FA',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,12 +109,40 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				'pulse-glow': {
+					'0%, 100%': { 
+						boxShadow: '0 0 5px 0px rgba(159, 159, 227, 0.3)' 
+					},
+					'50%': { 
+						boxShadow: '0 0 15px 5px rgba(159, 159, 227, 0.5)' 
+					}
+				},
+				'mood-bounce': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-5px)' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				'slide-up': {
+					'0%': { transform: 'translateY(10px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' }
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-glow': 'pulse-glow 2s infinite',
+				'mood-bounce': 'mood-bounce 0.3s ease',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'slide-up': 'slide-up 0.3s ease-out',
+			},
+			backgroundImage: {
+				'lavender-blush': 'linear-gradient(135deg, #E6E6FA 0%, #FFE4E1 100%)',
+				'mint-sky': 'linear-gradient(135deg, #E0F5E6 0%, #E1F5FE 100%)',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
