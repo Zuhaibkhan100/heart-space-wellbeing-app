@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
@@ -7,9 +6,12 @@ import { MoodTracker } from "@/components/dashboard/MoodTracker";
 import { HabitTracker } from "@/components/dashboard/HabitTracker";
 import { DailyAffirmation } from "@/components/dashboard/DailyAffirmation";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Link, useNavigate } from "react-router-dom";
+import { Logo } from "@/components/layout/Logo";
 
 const Index = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
   // For demo purposes, we'll include a way to toggle between logged in and out
   const handleAuthToggle = () => {
@@ -20,18 +22,41 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-lavender-blush flex flex-col items-center justify-center p-4">
         <div className="text-center mb-8 animate-slide-up">
-          <div className="flex justify-center mb-2">
-            <div className="h-12 w-12 rounded-full bg-white flex items-center justify-center shadow-md">
-              <svg className="h-6 w-6 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
-          </div>
+          <Logo className="mx-auto mb-4" />
           <h1 className="text-3xl font-heading font-bold gradient-text mb-2">Welcome to Lovable</h1>
           <p className="text-muted-foreground">Your journey to mindfulness starts here.</p>
         </div>
         
-        <AuthForm />
+        <div className="w-full max-w-md">
+          <div className="flex flex-col space-y-4">
+            <Button 
+              size="lg" 
+              className="w-full"
+              onClick={() => navigate('/auth')}
+            >
+              Sign in with Email
+            </Button>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t"></span>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-lavender-blush px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-3">
+              {["Google", "Apple", "Facebook"].map((provider) => (
+                <Button key={provider} variant="outline" className="bg-white/50 hover:bg-white">
+                  {provider}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
         
         {/* Demo toggle button */}
         <div className="mt-8">
