@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
@@ -49,10 +48,7 @@ const CoachPage = () => {
   // Check if API key exists on mount
   useEffect(() => {
     if (!hasApiKey()) {
-      toast({
-        title: "API Key Required",
-        description: "Please add your OpenAI API key to enable the AI assistant",
-      });
+      toast.info("Please add your OpenAI API key to enable the AI assistant");
     }
   }, []);
   
@@ -124,11 +120,7 @@ const CoachPage = () => {
         setMessages(prev => [...prev, errorMessage]);
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to get response from AI service",
-        variant: "destructive",
-      });
+      toast.error("Failed to get response from AI service");
     } finally {
       setIsTyping(false);
       setIsProcessing(false);
