@@ -49,26 +49,26 @@ export const getChatResponse = async (
 
     // Format conversation for the API
     const messages = [
-      {
-        role: "system",
-        content: "You are a supportive wellness coach. Be empathetic, encouraging, and provide helpful advice for mental wellbeing. Keep responses concise and actionable."
-      },
       ...previousMessages,
       { role: "user", content: message }
     ];
 
-    // Make API request to DeepSeek API
-    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+    // Make API request to Gemini API
+    const response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
+        "x-goog-api-key": apiKey,
       },
       body: JSON.stringify({
-        model: "deepseek-chat",  // Using DeepSeek chat model
-        messages: messages,
-        max_tokens: 300,
-        temperature: 0.7,
+        contents: messages.map(msg => ({
+          role: msg.role === "assistant" ? "MODEL" : "USER",
+          parts: [{ text: msg.content }]
+        })),
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 300,
+        },
       }),
     });
 
@@ -83,7 +83,7 @@ export const getChatResponse = async (
     }
 
     return {
-      message: data.choices[0].message.content,
+      message: data.candidates[0].content.parts[0].text || "No response generated.",
       success: true,
     };
   } catch (error) {

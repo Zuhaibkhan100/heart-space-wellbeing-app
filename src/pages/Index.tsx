@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AuthForm } from "@/components/auth/AuthForm";
@@ -5,6 +6,7 @@ import { AppSidebar } from "@/components/layout/AppSidebar";
 import { MoodTracker } from "@/components/dashboard/MoodTracker";
 import { HabitTracker } from "@/components/dashboard/HabitTracker";
 import { DailyAffirmation } from "@/components/dashboard/DailyAffirmation";
+import { StudyTimer } from "@/components/dashboard/StudyTimer"; 
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Link, useNavigate } from "react-router-dom";
 import { Logo } from "@/components/layout/Logo";
@@ -89,7 +91,11 @@ const Index = () => {
               <DailyAffirmation />
             </div>
             
-            <div className="lg:col-span-3 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+            <div className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
+              <StudyTimer />
+            </div>
+            
+            <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: "0.4s" }}>
               <HabitTracker />
             </div>
           </div>
