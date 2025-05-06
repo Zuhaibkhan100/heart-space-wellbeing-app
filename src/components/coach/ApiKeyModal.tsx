@@ -61,13 +61,13 @@ export function ApiKeyModal({ open, onClose }: ApiKeyModalProps) {
           <DialogDescription>
             {hasKey 
               ? "Your API key is securely stored. You can update or remove it."
-              : "Enter your OpenAI API key to enable the AI assistant features."}
+              : "Enter your DeepSeek API key to enable the AI assistant features."}
           </DialogDescription>
         </DialogHeader>
         
         <div className="py-4">
           <Input
-            placeholder={hasKey ? "••••••••••••••••••••••" : "sk-..."}
+            placeholder={hasKey ? "••••••••••••••••••••••" : "Enter your DeepSeek API key"}
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
