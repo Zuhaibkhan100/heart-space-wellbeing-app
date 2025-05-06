@@ -18,8 +18,7 @@ export function ApiKeyModal({ open, onClose }: ApiKeyModalProps) {
 
   const handleSave = () => {
     if (!apiKey.trim() && !hasKey) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "Please enter a valid API key",
         variant: "destructive",
       });
@@ -31,16 +30,14 @@ export function ApiKeyModal({ open, onClose }: ApiKeyModalProps) {
     try {
       if (apiKey.trim()) {
         saveApiKey(apiKey);
-        toast({
-          title: "Success",
+        toast("Success", {
           description: "Your API key has been saved",
         });
       }
       setApiKey("");
       onClose();
     } catch (error) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "Failed to save API key",
         variant: "destructive",
       });
@@ -55,14 +52,12 @@ export function ApiKeyModal({ open, onClose }: ApiKeyModalProps) {
     try {
       clearApiKey();
       setApiKey("");
-      toast({
-        title: "Success",
+      toast("Success", {
         description: "Your API key has been removed",
       });
       onClose();
     } catch (error) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "Failed to remove API key",
         variant: "destructive",
       });
