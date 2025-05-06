@@ -1,0 +1,117 @@
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { saveApiKey, hasApiKey, clearApiKey } from "@/services/aiService";
+import { toast } from "@/components/ui/sonner";
+
+interface ApiKeyModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export function ApiKeyModal({ open, onClose }: ApiKeyModalProps) {
+  const [apiKey, setApiKey] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const hasKey = hasApiKey();
+
+  const handleSave = () => {
+    if (!apiKey.trim() && !hasKey) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid API key",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      if (apiKey.trim()) {
+        saveApiKey(apiKey);
+        toast({
+          title: "Success",
+          description: "Your API key has been saved",
+        });
+      }
+      setApiKey("");
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save API key",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemove = () => {
+    setIsLoading(true);
+    
+    try {
+      clearApiKey();
+      setApiKey("");
+      toast({
+        title: "Success",
+        description: "Your API key has been removed",
+      });
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to remove API key",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>API Key Settings</DialogTitle>
+          <DialogDescription>
+            {hasKey 
+              ? "Your API key is securely stored. You can update or remove it."
+              : "Enter your OpenAI API key to enable the AI assistant features."}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="py-4">
+          <Input
+            placeholder={hasKey ? "••••••••••••••••••••••" : "sk-..."}
+            type="password"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            className="mt-2"
+          />
+          <p className="text-xs text-muted-foreground mt-2">
+            Your API key is stored locally in your browser and never sent to our servers.
+          </p>
+        </div>
+        
+        <DialogFooter>
+          {hasKey && (
+            <Button 
+              variant="outline" 
+              onClick={handleRemove} 
+              disabled={isLoading}
+              className="mr-auto"
+            >
+              Remove Key
+            </Button>
+          )}
+          <Button onClick={handleSave} disabled={isLoading}>
+            {hasKey ? "Update Key" : "Save Key"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

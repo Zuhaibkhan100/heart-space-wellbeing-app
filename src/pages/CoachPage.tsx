@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SendIcon, Mic, PauseCircle, Heart, ThumbsUp, ThumbsDown } from "lucide-react";
+import { SendIcon, Mic, PauseCircle, Heart, ThumbsUp, ThumbsDown, Settings } from "lucide-react";
+import { toast } from "@/components/ui/sonner";
+import { getChatResponse, hasApiKey, AIMessage } from "@/services/aiService";
+import { ApiKeyModal } from "@/components/coach/ApiKeyModal";
 
 // Example coaching prompts
 const coachingPrompts = [
@@ -17,16 +20,6 @@ const coachingPrompts = [
   "Tell me about a recent win or achievement",
   "What's one small step you can take today for your wellbeing?"
 ];
-
-// Sample AI responses for demo
-const aiResponses: Record<string, string> = {
-  "hello": "Hi there! How are you feeling today? I'm here to support your mental wellness journey.",
-  "how are you": "I'm here and ready to help you! How about you tell me how you're doing today?",
-  "i'm feeling stressed": "I'm sorry to hear you're feeling stressed. That's really challenging. Would you like to talk about what's causing it, or perhaps try a quick breathing exercise to help you center yourself?",
-  "i'm feeling anxious": "Anxiety can be really difficult to deal with. Remember that your feelings are valid. Would it help to identify what might be triggering these feelings right now?",
-  "i'm feeling good": "That's wonderful to hear! What's something that contributed to your positive mood today? Recognizing these patterns can help build more good moments.",
-  "help": "I'm here to support you on your wellness journey. You can talk about your feelings, ask for mindfulness exercises, get tips for better sleep, or just chat about your day. What would be most helpful right now?"
-};
 
 interface Message {
   id: string;
@@ -48,8 +41,20 @@ const CoachPage = () => {
   ]);
   const [isRecording, setIsRecording] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [apiKeyModalOpen, setApiKeyModalOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Check if API key exists on mount
+  useEffect(() => {
+    if (!hasApiKey()) {
+      toast({
+        title: "API Key Required",
+        description: "Please add your OpenAI API key to enable the AI assistant",
+      });
+    }
+  }, []);
   
   // Scroll to bottom of messages
   useEffect(() => {
@@ -62,9 +67,24 @@ const CoachPage = () => {
     setTimeout(() => setIsTyping(false), 1500);
   };
   
+  // Format messages for API call
+  const formatMessagesForApi = (): AIMessage[] => {
+    return messages
+      .filter(msg => msg.id !== "welcome") // Skip the welcome message
+      .map(msg => ({
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.content
+      }));
+  };
+  
   // Handle message submission
-  const handleSendMessage = () => {
-    if (!input.trim()) return;
+  const handleSendMessage = async () => {
+    if (!input.trim() || isProcessing) return;
+    
+    if (!hasApiKey()) {
+      setApiKeyModalOpen(true);
+      return;
+    }
     
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -75,29 +95,44 @@ const CoachPage = () => {
     
     setMessages(prev => [...prev, userMessage]);
     setInput("");
-    simulateTyping();
+    setIsTyping(true);
+    setIsProcessing(true);
     
-    // Simulate AI response
-    setTimeout(() => {
-      let response = "I'm not sure how to respond to that. Could you try phrasing it differently?";
+    try {
+      // Get previous conversation context
+      const previousMessages = formatMessagesForApi();
       
-      // Check for matching responses
-      for (const [key, value] of Object.entries(aiResponses)) {
-        if (input.toLowerCase().includes(key)) {
-          response = value;
-          break;
-        }
+      // Call the API service
+      const response = await getChatResponse(input, previousMessages);
+      
+      if (response.success) {
+        const aiMessage: Message = {
+          id: `ai-${Date.now()}`,
+          content: response.message,
+          sender: "ai",
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      } else {
+        // Show error as a message from assistant
+        const errorMessage: Message = {
+          id: `error-${Date.now()}`,
+          content: `${response.message} Would you like to update your API key?`,
+          sender: "ai",
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
       }
-      
-      const aiMessage: Message = {
-        id: `ai-${Date.now()}`,
-        content: response,
-        sender: "ai",
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, aiMessage]);
-    }, 2000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to get response from AI service",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTyping(false);
+      setIsProcessing(false);
+    }
   };
   
   // Handle voice toggle
@@ -133,10 +168,23 @@ const CoachPage = () => {
         <AppSidebar />
         <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
           <div className="mb-8 animate-fade-in">
-            <h1 className="text-3xl font-heading font-bold">Wellness Coach</h1>
-            <p className="text-muted-foreground">
-              Chat with your AI wellness companion
-            </p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-heading font-bold">Wellness Coach</h1>
+                <p className="text-muted-foreground">
+                  Chat with your AI wellness companion
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2"
+                onClick={() => setApiKeyModalOpen(true)}
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">API Key</span>
+              </Button>
+            </div>
           </div>
           
           <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -254,8 +302,13 @@ const CoachPage = () => {
                             handleSendMessage();
                           }
                         }}
+                        disabled={isProcessing}
                       />
-                      <Button size="icon" disabled={!input.trim()} onClick={handleSendMessage}>
+                      <Button 
+                        size="icon" 
+                        disabled={!input.trim() || isProcessing} 
+                        onClick={handleSendMessage}
+                      >
                         <SendIcon className="h-5 w-5" />
                       </Button>
                     </div>
@@ -283,6 +336,11 @@ const CoachPage = () => {
           </div>
         </main>
       </div>
+      
+      <ApiKeyModal 
+        open={apiKeyModalOpen} 
+        onClose={() => setApiKeyModalOpen(false)} 
+      />
     </SidebarProvider>
   );
 };
