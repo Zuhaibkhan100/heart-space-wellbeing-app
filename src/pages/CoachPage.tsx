@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
@@ -10,6 +11,7 @@ import { SendIcon, Mic, PauseCircle, Heart, ThumbsUp, ThumbsDown, Settings } fro
 import { toast } from "@/components/ui/sonner";
 import { getChatResponse, hasApiKey, AIMessage } from "@/services/aiService";
 import { ApiKeyModal } from "@/components/coach/ApiKeyModal";
+import { StudyTimer } from "@/components/dashboard/StudyTimer";
 
 // Example coaching prompts
 const coachingPrompts = [
@@ -48,7 +50,7 @@ const CoachPage = () => {
   // Check if API key exists on mount
   useEffect(() => {
     if (!hasApiKey()) {
-      toast.info("Please add your OpenAI API key to enable the AI assistant");
+      toast.info("Please add your Gemini API key to enable the AI assistant");
     }
   }, []);
   
@@ -176,6 +178,13 @@ const CoachPage = () => {
                 <Settings className="h-4 w-4" />
                 <span className="hidden sm:inline">API Key</span>
               </Button>
+            </div>
+          </div>
+          
+          {/* Study Timer Section */}
+          <div className="mb-8">
+            <div className="max-w-4xl mx-auto">
+              <StudyTimer />
             </div>
           </div>
           

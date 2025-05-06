@@ -60,7 +60,7 @@ export function ApiKeyModal({ open, onClose }: ApiKeyModalProps) {
           <DialogTitle>API Key Settings</DialogTitle>
           <DialogDescription>
             {hasKey 
-              ? "Your API key is securely stored. You can update or remove it."
+              ? "Your Gemini API key is securely stored. You can update or remove it."
               : "Enter your Gemini API key to enable the AI assistant features."}
           </DialogDescription>
         </DialogHeader>
@@ -74,7 +74,7 @@ export function ApiKeyModal({ open, onClose }: ApiKeyModalProps) {
             className="mt-2"
           />
           <p className="text-xs text-muted-foreground mt-2">
-            Your API key is stored locally in your browser and never sent to our servers.
+            Your API key is stored locally in your browser and never sent to our servers. Make sure you're using a key for gemini-1.5-flash model.
           </p>
         </div>
         
